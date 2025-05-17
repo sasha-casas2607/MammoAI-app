@@ -14,6 +14,20 @@ import streamlit.components.v1 as components
 
 st.set_page_config(page_title="Image Classifier", layout="centered")
 
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background-color: #efa9ce !important;
+    }
+    .css-1d391kg {
+        background-color: #efa9ce !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 class_names = ['calcification BENIGN', 'calcification MALIGNANT', 'mass BENIGN', 'mass MALIGNANT']
 image_size = (224, 224)
 
@@ -110,14 +124,6 @@ def predict_and_display(image_array, raw_path):
     ax.axis("off")
     plt.subplots_adjust(left=0, right=1, top=1, bottom=0)  # REMOVE padding
     st.pyplot(fig)
-    
-st.markdown("""
-    <style>
-    .main {
-        background-color: #efa9ce;
-    }
-    </style>
-    """, unsafe_allow_html=True)
 
 if "image_source" not in st.session_state:
     st.session_state.image_source = None
