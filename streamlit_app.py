@@ -94,7 +94,7 @@ def apply_gradcam(image, heatmap, alpha=0.4):
 # -------------------- Model and Metrics Loading --------------------
 @st.cache_resource
 def load_model():
-    return keras.models.load_model("my_cnn_model.h5")
+    return keras.models.load_model("my_cnn_model_main.h5")
 
 @st.cache_data
 def load_metrics_table():
