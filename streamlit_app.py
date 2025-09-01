@@ -64,7 +64,7 @@ def get_last_conv_layer(model):
             return layer.name
     raise ValueError("No Conv2D layer found.")
 
-def make_gradcam_heatmap(img_array, model, last_conv_layer_name):
+def make_gradcam_heatmap(img_array, model, last_conv_layer_name, pred_index):
     #Create the model that uses the image pixels to output the original model's classes and the feature maps of the last convolutional layer
     grad_model = tf.keras.models.Model(
         inputs=model.input,
@@ -75,8 +75,6 @@ def make_gradcam_heatmap(img_array, model, last_conv_layer_name):
     with tf.GradientTape() as tape:
         #Use the temporrary model defined above to calculate the feature maps and model classes
         conv_outputs, predictions = grad_model(img_array)
-        #Define the target class as the one with the highest score
-        pred_index = tf.argmax(predictions[0])
         #Get the socre for the target class
         class_channel = predictions[:, pred_index]
 
@@ -197,7 +195,7 @@ def predict_and_display(input_img, image_source="upload", roi_path=None):
     elif view_choice == "Grad-CAM Overlay":
         # Use the GradCam functions to obtain the heatmap for the selected image
         last_conv_layer_name = get_last_conv_layer(model)
-        heatmap = make_gradcam_heatmap(image_array, model, last_conv_layer_name)
+        heatmap = make_gradcam_heatmap(image_array, model, last_conv_layer_name, predicted_index)
         overlay = apply_gradcam((input_img * 255).astype("uint8"), heatmap)
         ax.imshow(overlay[..., 0], cmap='jet')
     elif view_choice == "ROI":
