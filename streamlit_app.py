@@ -65,9 +65,6 @@ def get_last_conv_layer(model):
     raise ValueError("No Conv2D layer found.")
 
 def make_gradcam_heatmap(img_array, model, last_conv_layer_name, pred_index=None):
-    if isinstance(img_array, np.ndarray) and img_array.ndim == 3:
-        img_array = np.expand_dims(img_array, axis=0)
-
     grad_model = tf.keras.models.Model(
         inputs=model.input,
         outputs=[model.get_layer(last_conv_layer_name).output, model.output]
