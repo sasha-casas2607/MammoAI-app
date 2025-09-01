@@ -76,7 +76,10 @@ def make_gradcam_heatmap(img_array, model, last_conv_layer_name, pred_index):
         #Use the temporrary model defined above to calculate the feature maps and model classes
         conv_outputs, predictions = grad_model(img_array)
         #Get the socre for the target class
-        class_channel = predictions[:, pred_index]
+        if len(predictions.shape) == 1:
+            class_channel = predictions[pred_index]
+        else:
+            class_channel = predictions[:, pred_index]
 
     #Compute the gradients of the top class' score vs the convolutional feature maps
     grads = tape.gradient(class_channel, conv_outputs)
