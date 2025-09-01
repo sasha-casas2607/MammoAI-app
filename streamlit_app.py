@@ -64,21 +64,28 @@ def get_last_conv_layer(model):
             return layer.name
     raise ValueError("No Conv2D layer found.")
 
-def make_gradcam_heatmap(img_array, model, last_conv_layer_name, pred_index=None):
+def make_gradcam_heatmap(img_array, model, last_conv_layer_name):
+    #Create the model that uses the image pixels to output the original model's classes and the feature maps of the last convolutional layer
     grad_model = tf.keras.models.Model(
         inputs=model.input,
         outputs=[model.get_layer(last_conv_layer_name).output, model.output]
     )
-
+    
+    #Use GradientTape to record the gradients of the operations below
     with tf.GradientTape() as tape:
+        #Use the temporrary model defined above to calculate the feature maps and model classes
         conv_outputs, predictions = grad_model(img_array)
-        if pred_index is None:
-            pred_index = tf.argmax(predictions[0])
+        #Define the target class as the one with the highest score
+        pred_index = tf.argmax(predictions[0])
+        #Get the socre for the target class
         class_channel = predictions[:, pred_index]
 
+    #Compute the gradients of the top class' score vs the convolutional feature maps
     grads = tape.gradient(class_channel, conv_outputs)
+    #Average the gradients for each feature map
     pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))
 
+    #Compute and return a 2D heatmap that represents the gradients calculated above
     conv_outputs = conv_outputs[0]
     heatmap = conv_outputs @ pooled_grads[..., tf.newaxis]
     heatmap = tf.squeeze(heatmap)
